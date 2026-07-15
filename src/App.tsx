@@ -10,23 +10,20 @@ import { useAlgorithmPlayer } from './hooks/useAlgorithmPlayer'
 import { generateSteps } from './algorithms/stepGenerator'
 import styles from './App.module.css'
 
-// 模板占位符：生成仓库时由脚本替换为具体知识点信息
-// 占位约定见 .kiro/specs/tasks.md：替换 {{TOPIC_TITLE}} / {{TOPIC_NUMBER}} / {{TOPIC_CATEGORY}} / {{REPO_NAME}}
-const TOPIC_TITLE = '{{TOPIC_TITLE}}' // PLACEHOLDER
-const TOPIC_NUMBER = 0 // PLACEHOLDER {{TOPIC_NUMBER}}
-const TOPIC_CATEGORY = '{{TOPIC_CATEGORY}}' // PLACEHOLDER
-const REPO_NAME = '{{REPO_NAME}}' // PLACEHOLDER
+const TOPIC_TITLE = 'RowKey 设计与热点'
+const TOPIC_NUMBER = 4
+const TOPIC_CATEGORY = '数据模型'
+const REPO_NAME = 'hbase-04-rowkey-design'
 const REPO_URL = `https://github.com/CC11001100/${REPO_NAME}`
 
 const PRESETS: PresetData[] = [
-  { label: '默认场景', data: {} },
-  { label: '场景 A', data: {} },
-  { label: '场景 B', data: {} },
+  { label: '顺序 RowKey', data: {} },
+  { label: '加盐', data: {} },
+  { label: '哈希/反转', data: {} },
 ]
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState<CodeLanguage>('java')
-  // 当前选中的预设（模板演示用，仅用于触发重新计算）
   const [presetIndex, setPresetIndex] = useState(0)
 
   const steps = useMemo(() => generateSteps(), [presetIndex])
