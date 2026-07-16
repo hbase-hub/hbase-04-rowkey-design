@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Layout } from 'antd'
 import type { CodeLanguage, PresetData } from './types'
 import { Header } from './components/Header'
 import { DataInput } from './components/DataInput'
@@ -8,72 +9,78 @@ import { ControlPanel } from './components/ControlPanel'
 import { FloatingBall } from './components/FloatingBall'
 import { useAlgorithmPlayer } from './hooks/useAlgorithmPlayer'
 import { generateSteps } from './algorithms/stepGenerator'
-import styles from './App.module.css'
 
+// 模板占位符：生成仓库时由脚本替换为具体知识点信息
 const TOPIC_TITLE = 'RowKey 设计与热点'
 const TOPIC_NUMBER = 4
 const TOPIC_CATEGORY = '数据模型'
 const REPO_NAME = 'hbase-04-rowkey-design'
-const REPO_URL = `https://github.com/CC11001100/${REPO_NAME}`
+const REPO_URL = `https://github.com/hbase-hub/${REPO_NAME}`
 
 const PRESETS: PresetData[] = [
-  { label: '顺序 RowKey', data: {} },
-  { label: '加盐', data: {} },
-  { label: '哈希/反转', data: {} },
+  { label: '默认场景', data: {} },
+  { label: '场景 A', data: {} },
+  { label: '场景 B', data: {} },
 ]
+
+const { Content } = Layout
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState<CodeLanguage>('java')
   const [presetIndex, setPresetIndex] = useState(0)
 
   const steps = useMemo(() => generateSteps(), [presetIndex])
-
   const [playerState, playerActions] = useAlgorithmPlayer(steps)
-
   const currentStep = steps[playerState.currentStepIndex] ?? steps[0]
 
   return (
-    <div className={styles.app}>
+    <Layout style={{ minHeight: '100vh' }}>
       <Header
         title={TOPIC_TITLE}
         topicNumber={TOPIC_NUMBER}
         category={TOPIC_CATEGORY}
         repoUrl={REPO_URL}
       />
-
-      <DataInput
-        presets={PRESETS}
-        onSelect={(preset) => setPresetIndex(PRESETS.indexOf(preset))}
-      />
-
-      <main className={styles.main}>
-        <div className={styles.leftPanel}>
-          <Canvas step={currentStep} />
-          <ControlPanel
-            currentStep={playerState.currentStepIndex}
-            totalSteps={playerState.totalSteps}
-            isPlaying={playerState.isPlaying}
-            playbackRate={playerState.playbackRate}
-            onPrev={playerActions.prev}
-            onNext={playerActions.next}
-            onPlay={playerActions.play}
-            onPause={playerActions.pause}
-            onReset={playerActions.reset}
-            onSeek={playerActions.seek}
-            onPlaybackRateChange={playerActions.setPlaybackRate}
-          />
+      <Content style={{ padding: 16 }}>
+        <div style={{ marginBottom: 12 }}>
+          <DataInput presets={PRESETS} onSelect={(_preset, i) => setPresetIndex(i)} />
         </div>
-        <div className={styles.rightPanel}>
-          <CodeDebugger
-            language={selectedLanguage}
-            onLanguageChange={setSelectedLanguage}
-            currentLine={currentStep.currentLine}
-            variables={currentStep.variables}
-          />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) 480px',
+            gap: 16,
+            maxWidth: 1600,
+            margin: '0 auto',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <Canvas step={currentStep} />
+            <ControlPanel
+              currentStep={playerState.currentStepIndex}
+              totalSteps={playerState.totalSteps}
+              isPlaying={playerState.isPlaying}
+              playbackRate={playerState.playbackRate}
+              onPrev={playerActions.prev}
+              onNext={playerActions.next}
+              onPlay={playerActions.play}
+              onPause={playerActions.pause}
+              onReset={playerActions.reset}
+              onSeek={playerActions.seek}
+              onPlaybackRateChange={playerActions.setPlaybackRate}
+            />
+          </div>
+          <div>
+            <CodeDebugger
+              language={selectedLanguage}
+              onLanguageChange={setSelectedLanguage}
+              currentLine={currentStep.currentLine}
+              variables={currentStep.variables}
+            />
+          </div>
         </div>
-      </main>
-
+      </Content>
       <FloatingBall />
-    </div>
+    </Layout>
   )
 }
